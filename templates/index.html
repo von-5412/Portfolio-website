@@ -62,125 +62,56 @@
         </div>
         
         <div class="row">
-            <!-- Project 1 -->
+            {% for project in projects %}
             <div class="col-lg-6 mb-4">
                 <div class="portfolio-item">
-                    <div class="portfolio-status">🚀 Live Project</div>
+                    <div class="portfolio-status">{{ project.status }}</div>
                     <div class="portfolio-image">
-                        <img src="https://pixabay.com/get/g3af4886b02c06dec51e3fd27787af713b51c9be1d99d00a701414324d4f030d8692fbe7e8c4fc5a4fe3758a531b1faf9a4c104f3102a5e6f304a58ba91169422_1280.jpg" 
-                             alt="AI Fitness Tracker" class="img-fluid">
+                        <img src="{{ project.thumbnail_url or 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                             alt="{{ project.title }}" class="img-fluid">
                         <div class="portfolio-overlay">
                             <div class="portfolio-links">
-                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                                <a href="#" class="btn btn-light btn-sm"><i class="fab fa-github"></i> Code</a>
+                                {% if project.project_url %}
+                                <a href="{{ project.project_url }}" target="_blank" class="btn btn-light btn-sm me-2">
+                                    <i class="fas fa-external-link-alt"></i> Live Demo
+                                </a>
+                                {% endif %}
+                                {% if project.github_url %}
+                                <a href="{{ project.github_url }}" target="_blank" class="btn btn-light btn-sm">
+                                    <i class="fab fa-github"></i> Code
+                                </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                     <div class="portfolio-content">
-                        <h4>AI Fitness Tracker</h4>
-                        <p>Built an intelligent fitness app that uses machine learning to create personalized workout plans. Features real-time form correction using computer vision.</p>
+                        <h4>{{ project.title }}</h4>
+                        <p>{{ project.description }}</p>
                         <div class="portfolio-metrics">
-                            <span class="metric"><i class="fas fa-users"></i> 2.3k users</span>
-                            <span class="metric"><i class="fas fa-star"></i> 4.8/5 rating</span>
+                            {% if project.users_count %}
+                            <span class="metric"><i class="fas fa-users"></i> {{ project.users_count }}</span>
+                            {% endif %}
+                            {% if project.rating > 0 %}
+                            <span class="metric"><i class="fas fa-star"></i> {{ project.rating }}/5 rating</span>
+                            {% endif %}
+                            {% for metric in project.get_metrics_list() %}
+                            <span class="metric"><i class="fas fa-chart-line"></i> {{ metric }}</span>
+                            {% endfor %}
                         </div>
                         <div class="portfolio-tags">
-                            <span class="badge bg-primary">Python</span>
-                            <span class="badge bg-secondary">TensorFlow</span>
-                            <span class="badge bg-accent">React Native</span>
+                            {% for tech in project.get_tech_list() %}
+                            <span class="badge bg-primary">{{ tech }}</span>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Project 2 -->
-            <div class="col-lg-6 mb-4">
-                <div class="portfolio-item">
-                    <div class="portfolio-status">💰 Client Project</div>
-                    <div class="portfolio-image">
-                        <img src="https://pixabay.com/get/g365e037a35adbfe1b4af2927a32692a59da6146d599aa49c1dad6a17b2e1ea97b0e63da1489f775ea5913ecb98cd02c5f35ec19622015a879fa5594d3015a85a_1280.jpg" 
-                             alt="E-commerce Dashboard" class="img-fluid">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-links">
-                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-lock"></i> Private</a>
-                                <a href="#" class="btn btn-light btn-sm"><i class="fas fa-envelope"></i> Request Access</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="portfolio-content">
-                        <h4>E-commerce Analytics Dashboard</h4>
-                        <p>Custom analytics platform for a startup that grew from 0 to $2M ARR. Real-time data visualization with predictive insights.</p>
-                        <div class="portfolio-metrics">
-                            <span class="metric"><i class="fas fa-chart-line"></i> 300% ROI</span>
-                            <span class="metric"><i class="fas fa-clock"></i> 6 weeks</span>
-                        </div>
-                        <div class="portfolio-tags">
-                            <span class="badge bg-primary">Vue.js</span>
-                            <span class="badge bg-secondary">D3.js</span>
-                            <span class="badge bg-accent">PostgreSQL</span>
-                        </div>
-                    </div>
-                </div>
+            {% else %}
+            <!-- Fallback content if no projects exist -->
+            <div class="col-12 text-center">
+                <p class="text-muted">No projects to display yet. Check back soon!</p>
             </div>
-            
-            <!-- Project 3 -->
-            <div class="col-lg-6 mb-4">
-                <div class="portfolio-item">
-                    <div class="portfolio-status">🔥 Side Project</div>
-                    <div class="portfolio-image">
-                        <img src="https://pixabay.com/get/g10b8156f3ffdc86b9db4e1aa071b01cb4db78dca4d23f1fdd7bed02b247dcd045e2539a6ae207af4ae92d1af905932f1e4c8c27dacee8625aee238fec7fc7475_1280.jpg" 
-                             alt="Music Discovery AI" class="img-fluid">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-links">
-                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fab fa-spotify"></i> Try It</a>
-                                <a href="#" class="btn btn-light btn-sm"><i class="fab fa-github"></i> Source</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="portfolio-content">
-                        <h4>MoodTunes AI</h4>
-                        <p>Weekend project that went viral! AI-powered music recommendation based on your current mood, detected through facial recognition and text analysis.</p>
-                        <div class="portfolio-metrics">
-                            <span class="metric"><i class="fab fa-reddit"></i> Front page</span>
-                            <span class="metric"><i class="fas fa-download"></i> 15k downloads</span>
-                        </div>
-                        <div class="portfolio-tags">
-                            <span class="badge bg-primary">Flask</span>
-                            <span class="badge bg-secondary">OpenCV</span>
-                            <span class="badge bg-accent">Spotify API</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Project 4 -->
-            <div class="col-lg-6 mb-4">
-                <div class="portfolio-item">
-                    <div class="portfolio-status">⚡ Hackathon Winner</div>
-                    <div class="portfolio-image">
-                        <img src="https://pixabay.com/get/g736fb86344eac8c5436a86eab20605a800e59f0dff81fbe320d054e7db977425a59e2f2171984666c55c23d95b490c4050492edf623d1a265466752c028aab81_1280.jpg" 
-                             alt="Climate Action App" class="img-fluid">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-links">
-                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-trophy"></i> Details</a>
-                                <a href="#" class="btn btn-light btn-sm"><i class="fab fa-github"></i> Code</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="portfolio-content">
-                        <h4>CarbonTrace</h4>
-                        <p>Won first place at TechForGood Hackathon! Carbon footprint tracker that gamifies environmental action with social challenges and real impact metrics.</p>
-                        <div class="portfolio-metrics">
-                            <span class="metric"><i class="fas fa-trophy"></i> 1st Place</span>
-                            <span class="metric"><i class="fas fa-users"></i> 48 hours</span>
-                        </div>
-                        <div class="portfolio-tags">
-                            <span class="badge bg-primary">React</span>
-                            <span class="badge bg-secondary">Node.js</span>
-                            <span class="badge bg-accent">Climate API</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
