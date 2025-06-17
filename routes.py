@@ -29,11 +29,22 @@ def contact():
             flash('Please enter a valid email address.', 'error')
             return redirect(url_for('index') + '#contact')
         
+        # Save to database
+        contact = app.Contact(
+            name=name,
+            email=email,
+            subject=subject,
+            message=message
+        )
+        db.session.add(contact)
+        db.session.commit()
+        
         # Create and send email
-        msg = Message(
-            subject=f"Portfolio Contact: {subject}",
-            recipients=[app.config.get('MAIL_USERNAME', 'your-email@example.com')],
-            body=f"""
+        try:
+            msg = Message(
+                subject=f"Portfolio Contact: {subject}",
+                recipients=[app.config.get('MAIL_USERNAME', 'your-email@example.com')],
+                body=f"""
 New contact form submission:
 
 Name: {name}
@@ -42,11 +53,14 @@ Subject: {subject}
 
 Message:
 {message}
-            """,
-            reply_to=email
-        )
+                """,
+                reply_to=email
+            )
+            mail.send(msg)
+        except Exception as email_error:
+            logging.error(f"Email sending failed: {str(email_error)}")
+            # Continue even if email fails since we saved to database
         
-        mail.send(msg)
         flash('Thank you for your message! I\'ll get back to you soon.', 'success')
         
     except Exception as e:
@@ -107,7 +121,8 @@ def admin_dashboard():
         return redirect(url_for('index'))
     
     projects = app.Project.query.order_by(app.Project.created_at.desc()).all()
-    return render_template('admin_dashboard.html', projects=projects)
+    contacts = app.Contact.query.order_by(app.Contact.created_at.desc()).all()
+    return render_template('admin_dashboard.html', projects=projects, contacts=contacts)
 
 @app.route('/admin/project/add', methods=['GET', 'POST'])
 @login_required
@@ -180,4 +195,32 @@ def delete_project(project_id):
     db.session.delete(project)
     db.session.commit()
     flash('Project deleted successfully!', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/contact/mark-read/<int:contact_id>', methods=['POST'])
+@login_required
+def mark_contact_read(contact_id):
+    """Mark contact message as read"""
+    if not current_user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    contact = app.Contact.query.get_or_404(contact_id)
+    contact.is_read = True
+    db.session.commit()
+    flash('Message marked as read!', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/contact/delete/<int:contact_id>', methods=['POST'])
+@login_required
+def delete_contact(contact_id):
+    """Delete contact message"""
+    if not current_user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    contact = app.Contact.query.get_or_404(contact_id)
+    db.session.delete(contact)
+    db.session.commit()
+    flash('Message deleted successfully!', 'success')
     return redirect(url_for('admin_dashboard'))

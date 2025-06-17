@@ -47,11 +47,12 @@ def load_user(user_id):
 with app.app_context():
     # Initialize models with db instance
     from models import init_models
-    User, Project = init_models(db)
+    User, Project, Contact = init_models(db)
     
     # Make models globally available
     app.User = User
     app.Project = Project
+    app.Contact = Contact
     
     db.create_all()
     
