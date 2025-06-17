@@ -4,119 +4,734 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ 'Edit' if project else 'Add' }} Project - Admin</title>
+    <title>{% if project %}Edit Project{% else %}Add Project{% endif %} - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --secondary-color: #ECF0F1;
+            --accent-color: #3498DB;
+            --success-color: #27AE60;
+            --danger-color: #E74C3C;
+            --warning-color: #F39C12;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --transition: all 0.3s ease;
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .navbar {
+            background: rgba(44, 62, 80, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, var(--accent-color), #E74C3C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideInUp 0.8s ease;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .form-header h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .form-section:nth-child(2) { animation-delay: 0.1s; }
+        .form-section:nth-child(3) { animation-delay: 0.2s; }
+        .form-section:nth-child(4) { animation-delay: 0.3s; }
+        .form-section:nth-child(5) { animation-delay: 0.4s; }
+
+        .form-section h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section h5 i {
+            color: var(--accent-color);
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--secondary-color);
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success-color);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group-text {
+            background: var(--accent-color);
+            color: white;
+            border: 2px solid var(--accent-color);
+            border-radius: 12px 0 0 12px;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .form-check {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-check:hover {
+            background: rgba(52, 152, 219, 0.05);
+            transform: translateX(5px);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .form-check-label {
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .rating-star {
+            font-size: 1.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .rating-star:hover,
+        .rating-star.active {
+            color: var(--warning-color);
+            transform: scale(1.1);
+        }
+
+        .btn-group-custom {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--light-gray);
+        }
+
+        .btn {
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-color), #5DADE2);
+            border-color: var(--accent-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #2980B9, var(--accent-color));
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #95a5a6);
+            border-color: #6c757d;
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #5a6268, #6c757d);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.3);
+        }
+
+        .preview-section {
+            background: var(--light-gray);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 2px dashed var(--accent-color);
+        }
+
+        .preview-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--secondary-color);
+            transition: var(--transition);
+        }
+
+        .image-preview:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .tech-tags-input {
+            position: relative;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--accent-color), #5DADE2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+            position: relative;
+            animation: slideInScale 0.3s ease;
+        }
+
+        .tech-tag .remove-tag {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .tech-tag .remove-tag:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .flash-messages {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 400px;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            animation: slideInRight 0.5s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                margin: 1rem;
+                padding: 2rem;
+                border-radius: 20px;
+            }
+
+            .btn-group-custom {
+                flex-direction: column;
+            }
+
+            .btn-group-custom .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">Portfolio Admin</a>
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-rocket me-2"></i>Portfolio Admin
+            </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-                <a class="nav-link" href="{{ url_for('admin_logout') }}">Logout</a>
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+                <a class="nav-link" href="{{ url_for('index') }}">
+                    <i class="fas fa-eye me-1"></i>View Portfolio
+                </a>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-8 mx-auto">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>{{ 'Edit' if project else 'Add New' }} Project</h3>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>
+                    {% if project %}
+                        <i class="fas fa-edit me-2"></i>Edit Project
+                    {% else %}
+                        <i class="fas fa-plus me-2"></i>Add New Project
+                    {% endif %}
+                </h2>
+                <p>{% if project %}Update your project details{% else %}Create a new portfolio project{% endif %}</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <div class="card-body">
-                        <form method="POST">
-                            <div class="mb-3">
-                                <label for="title" class="form-label">Project Title *</label>
-                                <input type="text" class="form-control" id="title" name="title" 
-                                       value="{{ project.title if project else '' }}" required>
-                            </div>
+                {% endif %}
+            {% endwith %}
 
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description *</label>
-                                <textarea class="form-control" id="description" name="description" rows="4" required>{{ project.description if project else '' }}</textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="thumbnail_url" class="form-label">Thumbnail URL</label>
-                                <input type="url" class="form-control" id="thumbnail_url" name="thumbnail_url" 
-                                       value="{{ project.thumbnail_url if project else '' }}">
-                                <div class="form-text">Link to project thumbnail image</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="project_url" class="form-label">Project URL</label>
-                                <input type="url" class="form-control" id="project_url" name="project_url" 
-                                       value="{{ project.project_url if project else '' }}">
-                                <div class="form-text">Live project link</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="github_url" class="form-label">GitHub URL</label>
-                                <input type="url" class="form-control" id="github_url" name="github_url" 
-                                       value="{{ project.github_url if project else '' }}">
-                                <div class="form-text">GitHub repository link</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="technologies" class="form-label">Technologies</label>
-                                <input type="text" class="form-control" id="technologies" name="technologies" 
-                                       value="{{ project.technologies if project else '' }}">
-                                <div class="form-text">Comma-separated list (e.g., Python, Flask, JavaScript)</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Status</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="🚀 Live Project" {{ 'selected' if project and project.status == '🚀 Live Project' else '' }}>🚀 Live Project</option>
-                                    <option value="👨‍💼 Client Project" {{ 'selected' if project and project.status == '👨‍💼 Client Project' else '' }}>👨‍💼 Client Project</option>
-                                    <option value="🛠️ Side Project" {{ 'selected' if project and project.status == '🛠️ Side Project' else '' }}>🛠️ Side Project</option>
-                                    <option value="📚 Learning Project" {{ 'selected' if project and project.status == '📚 Learning Project' else '' }}>📚 Learning Project</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="rating" class="form-label">Rating (0-5)</label>
-                                <input type="number" class="form-control" id="rating" name="rating" 
-                                       min="0" max="5" step="0.1" value="{{ project.rating if project else '0' }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="users_count" class="form-label">Users Count</label>
-                                <input type="text" class="form-control" id="users_count" name="users_count" 
-                                       value="{{ project.users_count if project else '' }}">
-                                <div class="form-text">e.g., "2.3k users", "500+ downloads"</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="metrics" class="form-label">Metrics</label>
-                                <input type="text" class="form-control" id="metrics" name="metrics" 
-                                       value="{{ project.metrics if project else '' }}">
-                                <div class="form-text">Comma-separated metrics (e.g., "300% ROI, 6 weeks, 95% uptime")</div>
-                            </div>
-
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" 
-                                       {{ 'checked' if project and project.is_featured else '' }}>
-                                <label class="form-check-label" for="is_featured">
-                                    Featured Project
-                                </label>
-                            </div>
-
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ 'Update' if project else 'Create' }} Project
-                                </button>
-                                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
-                            </div>
-                        </form>
+            <form method="POST" id="projectForm">
+                <div class="form-section">
+                    <h5><i class="fas fa-info-circle"></i>Basic Information</h5>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-heading"></i>Project Title
+                            </label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ project.title if project else '' }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="status" class="form-label">
+                                <i class="fas fa-flag"></i>Status
+                            </label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">Select Status</option>
+                                <option value="Live" {{ 'selected' if project and project.status == 'Live' else '' }}>Live</option>
+                                <option value="In Development" {{ 'selected' if project and project.status == 'In Development' else '' }}>In Development</option>
+                                <option value="Completed" {{ 'selected' if project and project.status == 'Completed' else '' }}>Completed</option>
+                                <option value="Archived" {{ 'selected' if project and project.status == 'Archived' else '' }}>Archived</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i>Description
+                        </label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="4" required>{{ project.description if project else '' }}</textarea>
                     </div>
                 </div>
-            </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-link"></i>Links & Media</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="project_url" class="form-label">
+                                <i class="fas fa-external-link-alt"></i>Live Demo URL
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                <input type="url" class="form-control" id="project_url" name="project_url" 
+                                       value="{{ project.project_url if project else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="github_url" class="form-label">
+                                <i class="fab fa-github"></i>GitHub Repository
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-github"></i></span>
+                                <input type="url" class="form-control" id="github_url" name="github_url" 
+                                       value="{{ project.github_url if project else '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="thumbnail_url" class="form-label">
+                            <i class="fas fa-image"></i>Thumbnail Image URL
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-image"></i></span>
+                            <input type="url" class="form-control" id="thumbnail_url" name="thumbnail_url" 
+                                   value="{{ project.thumbnail_url if project else '' }}">
+                        </div>
+                        <div class="preview-section" id="imagePreview" style="display: none;">
+                            <div class="preview-title">Image Preview</div>
+                            <div class="text-center">
+                                <img id="previewImg" class="image-preview" alt="Preview">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-cogs"></i>Technical Details</h5>
+                    <div class="mb-3">
+                        <label for="technologies" class="form-label">
+                            <i class="fas fa-tools"></i>Technologies Used
+                        </label>
+                        <input type="text" class="form-control" id="technologies" name="technologies" 
+                               value="{{ project.technologies if project else '' }}" 
+                               placeholder="e.g., React, Node.js, Python, MongoDB (comma-separated)">
+                        <div class="form-text">Separate technologies with commas</div>
+                        <div id="techTagsPreview" class="mt-2"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="key_metrics" class="form-label">
+                            <i class="fas fa-chart-bar"></i>Key Metrics
+                        </label>
+                        <input type="text" class="form-control" id="key_metrics" name="key_metrics" 
+                               value="{{ project.key_metrics if project else '' }}" 
+                               placeholder="e.g., 50k+ users, 99.9% uptime, 2s load time">
+                        <div class="form-text">Highlight key achievements and performance metrics</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-star"></i>Rating & Settings</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="rating" class="form-label">
+                                <i class="fas fa-star"></i>Project Rating
+                            </label>
+                            <div class="rating-container">
+                                <div class="rating-stars" id="ratingStars">
+                                    {% for i in range(1, 6) %}
+                                        <i class="fas fa-star rating-star" data-rating="{{ i }}"></i>
+                                    {% endfor %}
+                                </div>
+                                <span id="ratingText">0/5</span>
+                                <input type="hidden" id="rating" name="rating" value="{{ project.rating if project else 0 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="users_count" class="form-label">
+                                <i class="fas fa-users"></i>Users Count
+                            </label>
+                            <input type="number" class="form-control" id="users_count" name="users_count" 
+                                   value="{{ project.users_count if project else '' }}" min="0">
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" 
+                               {{ 'checked' if project and project.is_featured else '' }}>
+                        <label class="form-check-label" for="is_featured">
+                            <i class="fas fa-star me-2"></i>Feature this project on homepage
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group-custom">
+                    <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                        <i class="fas fa-save me-2"></i>
+                        {% if project %}Update Project{% else %}Create Project{% endif %}
+                    </button>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Rating functionality
+            const ratingStars = document.querySelectorAll('.rating-star');
+            const ratingInput = document.getElementById('rating');
+            const ratingText = document.getElementById('ratingText');
+            
+            // Set initial rating
+            const initialRating = parseInt(ratingInput.value) || 0;
+            updateRatingDisplay(initialRating);
+            
+            ratingStars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    ratingInput.value = rating;
+                    updateRatingDisplay(rating);
+                });
+                
+                star.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    highlightStars(rating);
+                });
+            });
+            
+            document.getElementById('ratingStars').addEventListener('mouseleave', function() {
+                updateRatingDisplay(parseInt(ratingInput.value) || 0);
+            });
+            
+            function updateRatingDisplay(rating) {
+                ratingText.textContent = `${rating}/5`;
+                highlightStars(rating);
+            }
+            
+            function highlightStars(rating) {
+                ratingStars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+
+            // Technologies preview
+            const techInput = document.getElementById('technologies');
+            const techPreview = document.getElementById('techTagsPreview');
+            
+            function updateTechPreview() {
+                const technologies = techInput.value.split(',').map(tech => tech.trim()).filter(tech => tech);
+                techPreview.innerHTML = '';
+                
+                technologies.forEach(tech => {
+                    const tag = document.createElement('span');
+                    tag.className = 'tech-tag';
+                    tag.innerHTML = `${tech} <i class="fas fa-times remove-tag"></i>`;
+                    
+                    tag.querySelector('.remove-tag').addEventListener('click', function() {
+                        removeTechnology(tech);
+                    });
+                    
+                    techPreview.appendChild(tag);
+                });
+            }
+            
+            function removeTechnology(techToRemove) {
+                const technologies = techInput.value.split(',').map(tech => tech.trim()).filter(tech => tech && tech !== techToRemove);
+                techInput.value = technologies.join(', ');
+                updateTechPreview();
+            }
+            
+            techInput.addEventListener('input', updateTechPreview);
+            updateTechPreview(); // Initial call
+
+            // Image preview
+            const thumbnailInput = document.getElementById('thumbnail_url');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            function updateImagePreview() {
+                const url = thumbnailInput.value.trim();
+                if (url) {
+                    previewImg.src = url;
+                    imagePreview.style.display = 'block';
+                    
+                    previewImg.onerror = function() {
+                        imagePreview.style.display = 'none';
+                    };
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            }
+            
+            thumbnailInput.addEventListener('input', updateImagePreview);
+            updateImagePreview(); // Initial call
+
+            // Form validation
+            const form = document.getElementById('projectForm');
+            const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', validateField);
+                input.addEventListener('input', clearValidation);
+            });
+            
+            function validateField(e) {
+                const field = e.target;
+                const value = field.value.trim();
+                
+                field.classList.remove('is-valid', 'is-invalid');
+                
+                if (field.hasAttribute('required') && !value) {
+                    field.classList.add('is-invalid');
+                    return false;
+                }
+                
+                if (field.type === 'url' && value) {
+                    try {
+                        new URL(value);
+                        field.classList.add('is-valid');
+                    } catch {
+                        field.classList.add('is-invalid');
+                        return false;
+                    }
+                } else if (value) {
+                    field.classList.add('is-valid');
+                }
+                
+                return true;
+            }
+            
+            function clearValidation(e) {
+                e.target.classList.remove('is-valid', 'is-invalid');
+            }
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+                submitBtn.disabled = true;
+                
+                // Re-enable button after a timeout if form doesn't submit
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }, 5000);
+            });
+
+            // Auto-hide flash messages
+            const flashMessages = document.querySelectorAll('.flash-messages .alert');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    if (message && message.parentNode) {
+                        const alert = new bootstrap.Alert(message);
+                        alert.close();
+                    }
+                }, 5000);
+            });
+
+            console.log('🚀 Project form loaded with enhanced features!');
+        });
+    </script>
 </body>
 </html>

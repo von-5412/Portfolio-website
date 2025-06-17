@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Intersection Observer for animations
+    // Enhanced Intersection Observer for animations
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -110,6 +110,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (entry.target.classList.contains('stat-number')) {
                     animateCounter(entry.target);
                 }
+                
+                // Stagger portfolio items animation
+                if (entry.target.classList.contains('portfolio-item')) {
+                    const portfolioItems = document.querySelectorAll('.portfolio-item');
+                    portfolioItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.style.transform = 'translateY(0) scale(1)';
+                            item.style.opacity = '1';
+                        }, index * 100);
+                    });
+                }
+                
+                // Animate section reveals
+                if (entry.target.classList.contains('section-reveal')) {
+                    entry.target.classList.add('revealed');
+                }
             }
         });
     }, observerOptions);
@@ -119,6 +135,62 @@ document.addEventListener('DOMContentLoaded', function() {
     animatedElements.forEach(el => {
         el.classList.add('loading');
         observer.observe(el);
+    });
+    
+    // Add section reveal animations
+    const sectionElements = document.querySelectorAll('section');
+    sectionElements.forEach(section => {
+        section.classList.add('section-reveal');
+        observer.observe(section);
+    });
+    
+    // Enhanced portfolio item interactions
+    const portfolioCards = document.querySelectorAll('.portfolio-item');
+    portfolioCards.forEach((card, index) => {
+        // Add mouse move parallax effect
+        card.addEventListener('mousemove', function(e) {
+            if (window.innerWidth > 768) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+            }
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+        });
+        
+        // Add click animation
+        card.addEventListener('click', function(e) {
+            // Create ripple effect
+            const ripple = document.createElement('div');
+            ripple.classList.add('click-ripple');
+            
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+        
+        // Add initial stagger animation
+        card.style.animationDelay = `${index * 0.1}s`;
     });
     
     // Counter animation for stats
@@ -338,8 +410,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Random portfolio item animations
-    const portfolioItems = document.querySelectorAll('.portfolio-item');
-    portfolioItems.forEach((item, index) => {
+    const portfolioItemsMain = document.querySelectorAll('.portfolio-item');
+    portfolioItemsMain.forEach((item, index) => {
         item.style.animationDelay = `${index * 0.2}s`;
         
         // Add glitch effect to project titles occasionally
@@ -347,6 +419,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (title && Math.random() > 0.7) {
             title.classList.add('glitch-text');
         }
+        
+        // Add stagger animation to portfolio items
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(30px)';
+        setTimeout(() => {
+            item.style.transition = 'all 0.8s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        }, index * 150);
     });
     
     // Interactive tech stack items
