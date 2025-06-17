@@ -1,6 +1,7 @@
-from flask import render_template, request, flash, redirect, url_for, jsonify
+from flask import render_template, request, flash, redirect, url_for, jsonify, session
 from flask_mail import Message
-from app import app, mail
+from flask_login import login_user, logout_user, login_required, current_user
+from app import app, mail, db
 import logging
 
 @app.route('/')
