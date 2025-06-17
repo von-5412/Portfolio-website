@@ -449,7 +449,7 @@
                     <div class="stat-icon users">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="stat-number">{{ projects|sum(attribute='users_count')|default(0) }}</div>
+                    <div class="stat-number">{{ projects|map(attribute='users_count')|map('int')|sum if projects else 0 }}</div>
                     <div class="stat-label">Total Users</div>
                 </div>
             </div>
