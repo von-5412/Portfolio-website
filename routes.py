@@ -7,7 +7,8 @@ import logging
 @app.route('/')
 def index():
     """Main portfolio page"""
-    return render_template('index.html')
+    projects = app.Project.query.filter_by(is_featured=True).order_by(app.Project.created_at.desc()).all()
+    return render_template('index.html', projects=projects)
 
 @app.route('/contact', methods=['POST'])
 def contact():
@@ -63,6 +64,12 @@ def not_found(error):
 def internal_error(error):
     """Handle 500 errors"""
     return render_template('index.html'), 500
+
+@app.route('/api/projects')
+def api_projects():
+    """API endpoint to get projects data"""
+    projects = app.Project.query.filter_by(is_featured=True).order_by(app.Project.created_at.desc()).all()
+    return jsonify([project.to_dict() for project in projects])
 
 # Admin routes
 @app.route('/admin/login', methods=['GET', 'POST'])

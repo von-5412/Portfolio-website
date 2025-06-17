@@ -41,8 +41,7 @@ login_manager.login_message = 'Please log in to access the admin panel.'
 
 @login_manager.user_loader
 def load_user(user_id):
-    from models import User
-    return User.query.get(int(user_id))
+    return app.User.query.get(int(user_id))
 
 # Create database tables and admin user
 with app.app_context():
