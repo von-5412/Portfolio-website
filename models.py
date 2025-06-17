@@ -83,5 +83,63 @@ def init_models(db):
                 'created_at': self.created_at.isoformat() if self.created_at else None,
                 'is_read': self.is_read
             }
+
+    class Visitor(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        ip_address = db.Column(db.String(45), nullable=False)
+        user_agent = db.Column(db.Text)
+        browser = db.Column(db.String(100))
+        os = db.Column(db.String(100))
+        device = db.Column(db.String(100))
+        country = db.Column(db.String(100))
+        city = db.Column(db.String(100))
+        referrer = db.Column(db.String(500))
+        page_visited = db.Column(db.String(200))
+        visit_duration = db.Column(db.Integer)  # in seconds
+        screen_resolution = db.Column(db.String(20))
+        language = db.Column(db.String(10))
+        visit_count = db.Column(db.Integer, default=1)
+        first_visit = db.Column(db.DateTime, default=datetime.utcnow)
+        last_visit = db.Column(db.DateTime, default=datetime.utcnow)
+        created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+        def to_dict(self):
+            return {
+                'id': self.id,
+                'ip_address': self.ip_address,
+                'user_agent': self.user_agent,
+                'browser': self.browser,
+                'os': self.os,
+                'device': self.device,
+                'country': self.country,
+                'city': self.city,
+                'referrer': self.referrer,
+                'page_visited': self.page_visited,
+                'visit_duration': self.visit_duration,
+                'screen_resolution': self.screen_resolution,
+                'language': self.language,
+                'visit_count': self.visit_count,
+                'first_visit': self.first_visit.isoformat() if self.first_visit else None,
+                'last_visit': self.last_visit.isoformat() if self.last_visit else None,
+                'created_at': self.created_at.isoformat() if self.created_at else None
+            }
+
+    class LoginAttempt(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        ip_address = db.Column(db.String(45), nullable=False)
+        username = db.Column(db.String(64))
+        success = db.Column(db.Boolean, default=False)
+        user_agent = db.Column(db.Text)
+        created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+        def to_dict(self):
+            return {
+                'id': self.id,
+                'ip_address': self.ip_address,
+                'username': self.username,
+                'success': self.success,
+                'user_agent': self.user_agent,
+                'created_at': self.created_at.isoformat() if self.created_at else None
+            }
     
-    return User, Project, Contact
+    return User, Project, Contact, Visitor, LoginAttempt

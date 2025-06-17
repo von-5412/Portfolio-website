@@ -479,6 +479,42 @@
             </div>
         </div>
 
+        <!-- Visitor Analytics -->
+        <div class="projects-table-container mb-4">
+            <div class="table-header">
+                <h3 class="table-title">
+                    <i class="fas fa-chart-line me-2"></i>Visitor Analytics
+                </h3>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Location</th>
+                            <th>Browser</th>
+                            <th>Operating System</th>
+                            <th>Device</th>
+                            <th>Last Visit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visitor in visitors %}
+                            <tr>
+                                <td>{{ visitor.ip_address }}</td>
+                                <td>{{ visitor.location }}</td>
+                                <td>{{ visitor.browser }}</td>
+                                <td>{{ visitor.os }}</td>
+                                <td>{{ visitor.device }}</td>
+                                <td>{{ visitor.last_visit }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Contact Messages Section -->
         <div class="projects-table-container mb-4">
             <div class="table-header">

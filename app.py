@@ -43,16 +43,24 @@ login_manager.login_message = 'Please log in to access the admin panel.'
 def load_user(user_id):
     return app.User.query.get(int(user_id))
 
+# Security configurations
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes
+
 # Create database tables and admin user
 with app.app_context():
     # Initialize models with db instance
     from models import init_models
-    User, Project, Contact = init_models(db)
+    User, Project, Contact, Visitor, LoginAttempt = init_models(db)
     
     # Make models globally available
     app.User = User
     app.Project = Project
     app.Contact = Contact
+    app.Visitor = Visitor
+    app.LoginAttempt = LoginAttempt
     
     db.create_all()
     

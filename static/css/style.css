@@ -764,29 +764,29 @@ h1, h2, h3, h4, h5, h6 {
     .hero-title {
         font-size: 2.5rem;
     }
-    
+
     .hero-subtitle {
         font-size: 1.4rem;
     }
-    
+
     .section-title {
         font-size: 2rem;
     }
-    
+
     .hero-section {
         padding: 2rem 0;
     }
-    
+
     .portfolio-section,
     .about-section,
     .contact-section {
         padding: 60px 0;
     }
-    
+
     .contact-form {
         padding: 2rem;
     }
-    
+
     .navbar-brand {
         font-size: 1.5rem;
     }
@@ -796,21 +796,21 @@ h1, h2, h3, h4, h5, h6 {
     .hero-title {
         font-size: 2rem;
     }
-    
+
     .hero-subtitle {
         font-size: 1.2rem;
     }
-    
+
     .hero-buttons .btn {
         display: block;
         margin-bottom: 1rem;
         width: 100%;
     }
-    
+
     .section-title {
         font-size: 1.8rem;
     }
-    
+
     .contact-form {
         padding: 1.5rem;
     }
@@ -1033,4 +1033,135 @@ html {
 .portfolio-item:hover .portfolio-metrics .metric i {
     transform: scale(1.2) rotate(5deg);
     color: var(--primary-color);
+}
+
+/* Admin Dashboard Styles */
+.admin-dashboard {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 0;
+}
+
+/* Analytics Styles */
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    border-left: 4px solid #3498db;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    color: #3498db;
+    margin-bottom: 15px;
+}
+
+.stat-content h4 {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.stat-content p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.analytics-card h5 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.chart-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.stat-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.stat-label {
+    min-width: 80px;
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.stat-progress {
+    flex: 1;
+    height: 8px;
+    background: #ecf0f1;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.stat-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.stat-count {
+    min-width: 40px;
+    text-align: right;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.badge-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.badge-success {
+    background-color: #27ae60;
+    color: white;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge-danger {
+    background-color: #e74c3c;
+    color: white;
 }

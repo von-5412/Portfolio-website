@@ -488,3 +488,57 @@ if ('performance' in window) {
         }, 0);
     });
 }
+
+// Visitor tracking
+function trackVisitorData() {
+    try {
+        const visitorData = {
+            screen_resolution: `${screen.width}x${screen.height}`,
+            visit_duration: Math.floor((Date.now() - window.pageLoadTime) / 1000)
+        };
+
+        fetch('/api/track-visitor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(visitorData)
+        }).catch(console.error);
+    } catch (error) {
+        console.error('Error tracking visitor data:', error);
+    }
+}
+
+// Track page load time
+window.pageLoadTime = Date.now();
+
+// Track visitor data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(trackVisitorData, 5000); // Track after 5 seconds
+});
+
+// Track when user leaves the page
+window.addEventListener('beforeunload', trackVisitorData);
+
+// Fix duplicate declaration error - Remove duplicate portfolioItems declaration
+const portfolioElements = document.querySelectorAll('.portfolio-item');
+
+// Portfolio item animations
+portfolioElements.forEach((item, index) => {
+    item.style.animationDelay = `${index * 0.2}s`;
+
+    // Add glitch effect to project titles occasionally
+    const title = item.querySelector('h4');
+    if (title && Math.random() > 0.7) {
+        title.classList.add('glitch-text');
+    }
+
+    // Add stagger animation to portfolio items
+    item.style.opacity = '0';
+    item.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+        item.style.transition = 'all 0.8s ease';
+        item.style.opacity = '1';
+        item.style.transform = 'translateY(0)';
+    }, index * 150);
+});

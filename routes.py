@@ -3,6 +3,138 @@ from flask_mail import Message
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, mail, db
 import logging
+import re
+from datetime import datetime, timedelta
+from functools import wraps
+from collections import defaultdict
+import json
+
+# Security helpers
+def get_client_ip():
+    """Get client IP address"""
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    elif request.headers.get('X-Real-IP'):
+        return request.headers.get('X-Real-IP')
+    else:
+        return request.remote_addr
+
+def parse_user_agent(user_agent_string):
+    """Parse user agent to extract browser, OS, and device info"""
+    browser = "Unknown"
+    os = "Unknown"
+    device = "Desktop"
+    
+    if user_agent_string:
+        # Browser detection
+        if "Chrome" in user_agent_string:
+            browser = "Chrome"
+        elif "Firefox" in user_agent_string:
+            browser = "Firefox"
+        elif "Safari" in user_agent_string and "Chrome" not in user_agent_string:
+            browser = "Safari"
+        elif "Edge" in user_agent_string:
+            browser = "Edge"
+        elif "Opera" in user_agent_string:
+            browser = "Opera"
+        
+        # OS detection
+        if "Windows" in user_agent_string:
+            os = "Windows"
+        elif "Mac OS X" in user_agent_string or "Macintosh" in user_agent_string:
+            os = "macOS"
+        elif "Linux" in user_agent_string:
+            os = "Linux"
+        elif "Android" in user_agent_string:
+            os = "Android"
+            device = "Mobile"
+        elif "iPhone" in user_agent_string or "iPad" in user_agent_string:
+            os = "iOS"
+            device = "Mobile" if "iPhone" in user_agent_string else "Tablet"
+        
+        # Device detection
+        if "Mobile" in user_agent_string or "iPhone" in user_agent_string:
+            device = "Mobile"
+        elif "Tablet" in user_agent_string or "iPad" in user_agent_string:
+            device = "Tablet"
+    
+    return browser, os, device
+
+def track_visitor():
+    """Track visitor information"""
+    try:
+        ip_address = get_client_ip()
+        user_agent = request.headers.get('User-Agent', '')
+        browser, os, device = parse_user_agent(user_agent)
+        referrer = request.headers.get('Referer', '')
+        page_visited = request.path
+        language = request.headers.get('Accept-Language', '').split(',')[0] if request.headers.get('Accept-Language') else 'en'
+        
+        # Check if visitor exists
+        existing_visitor = app.Visitor.query.filter_by(ip_address=ip_address).first()
+        
+        if existing_visitor:
+            # Update existing visitor
+            existing_visitor.visit_count += 1
+            existing_visitor.last_visit = datetime.utcnow()
+            existing_visitor.page_visited = page_visited
+            existing_visitor.user_agent = user_agent
+        else:
+            # Create new visitor record
+            visitor = app.Visitor(
+                ip_address=ip_address,
+                user_agent=user_agent,
+                browser=browser,
+                os=os,
+                device=device,
+                referrer=referrer,
+                page_visited=page_visited,
+                language=language
+            )
+            db.session.add(visitor)
+        
+        db.session.commit()
+    except Exception as e:
+        logging.error(f"Error tracking visitor: {str(e)}")
+
+def rate_limit_check(ip_address, action, limit=5, window=300):
+    """Check rate limiting for actions"""
+    try:
+        cutoff_time = datetime.utcnow() - timedelta(seconds=window)
+        
+        if action == 'login':
+            recent_attempts = app.LoginAttempt.query.filter(
+                app.LoginAttempt.ip_address == ip_address,
+                app.LoginAttempt.created_at > cutoff_time
+            ).count()
+        else:
+            # For other actions, you can implement similar logic
+            return True
+        
+        return recent_attempts < limit
+    except Exception as e:
+        logging.error(f"Error checking rate limit: {str(e)}")
+        return True
+
+def log_login_attempt(ip_address, username, success):
+    """Log login attempts for security monitoring"""
+    try:
+        login_attempt = app.LoginAttempt(
+            ip_address=ip_address,
+            username=username,
+            success=success,
+            user_agent=request.headers.get('User-Agent', '')
+        )
+        db.session.add(login_attempt)
+        db.session.commit()
+    except Exception as e:
+        logging.error(f"Error logging login attempt: {str(e)}")
+
+@app.before_request
+def before_request():
+    """Track visitors before each request"""
+    if request.endpoint not in ['static', 'admin_login', 'admin_logout']:
+        track_visitor()
 
 @app.route('/')
 def index():
@@ -85,22 +217,66 @@ def api_projects():
     projects = app.Project.query.filter_by(is_featured=True).order_by(app.Project.created_at.desc()).all()
     return jsonify([project.to_dict() for project in projects])
 
+@app.route('/api/track-visitor', methods=['POST'])
+def track_visitor_api():
+    """API endpoint to track additional visitor data from frontend"""
+    try:
+        data = request.get_json()
+        ip_address = get_client_ip()
+        
+        visitor = app.Visitor.query.filter_by(ip_address=ip_address).first()
+        if visitor:
+            if data.get('screen_resolution'):
+                visitor.screen_resolution = data['screen_resolution']
+            if data.get('visit_duration'):
+                visitor.visit_duration = data['visit_duration']
+            db.session.commit()
+        
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        logging.error(f"Error tracking visitor via API: {str(e)}")
+        return jsonify({'status': 'error'}), 500
+
 # Admin routes
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
-    """Admin login page"""
+    """Admin login page with security measures"""
+    ip_address = get_client_ip()
+    
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        
+        # Rate limiting check
+        if not rate_limit_check(ip_address, 'login'):
+            flash('Too many login attempts. Please try again later.', 'error')
+            log_login_attempt(ip_address, username, False)
+            return render_template('admin_login.html')
+        
+        # Input validation
+        if not username or not password:
+            flash('Username and password are required.', 'error')
+            log_login_attempt(ip_address, username, False)
+            return render_template('admin_login.html')
         
         user = app.User.query.filter_by(username=username).first()
         
         if user and user.check_password(password) and user.is_admin:
-            login_user(user)
+            login_user(user, remember=False)
+            session.permanent = True
             flash('Logged in successfully!', 'success')
+            log_login_attempt(ip_address, username, True)
+            
+            # Log successful admin login
+            logging.info(f"Admin login successful for {username} from {ip_address}")
+            
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid credentials or not an admin user.', 'error')
+            log_login_attempt(ip_address, username, False)
+            
+            # Log failed login attempt
+            logging.warning(f"Failed login attempt for {username} from {ip_address}")
     
     return render_template('admin_login.html')
 
@@ -115,14 +291,66 @@ def admin_logout():
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    """Admin dashboard with project management"""
+    """Admin dashboard with project management and visitor analytics"""
     if not current_user.is_admin:
         flash('Access denied.', 'error')
         return redirect(url_for('index'))
     
     projects = app.Project.query.order_by(app.Project.created_at.desc()).all()
     contacts = app.Contact.query.order_by(app.Contact.created_at.desc()).all()
-    return render_template('admin_dashboard.html', projects=projects, contacts=contacts)
+    
+    # Visitor analytics
+    total_visitors = app.Visitor.query.count()
+    recent_visitors = app.Visitor.query.filter(
+        app.Visitor.last_visit > datetime.utcnow() - timedelta(days=7)
+    ).order_by(app.Visitor.last_visit.desc()).limit(50).all()
+    
+    # Browser stats
+    browser_stats = db.session.query(
+        app.Visitor.browser, 
+        db.func.count(app.Visitor.browser).label('count')
+    ).group_by(app.Visitor.browser).all()
+    
+    # OS stats
+    os_stats = db.session.query(
+        app.Visitor.os, 
+        db.func.count(app.Visitor.os).label('count')
+    ).group_by(app.Visitor.os).all()
+    
+    # Device stats
+    device_stats = db.session.query(
+        app.Visitor.device, 
+        db.func.count(app.Visitor.device).label('count')
+    ).group_by(app.Visitor.device).all()
+    
+    # Login attempts (security monitoring)
+    recent_login_attempts = app.LoginAttempt.query.filter(
+        app.LoginAttempt.created_at > datetime.utcnow() - timedelta(days=7)
+    ).order_by(app.LoginAttempt.created_at.desc()).limit(20).all()
+    
+    # Daily visitor counts for the last 30 days
+    daily_visitors = []
+    for i in range(30):
+        date = datetime.utcnow().date() - timedelta(days=i)
+        count = app.Visitor.query.filter(
+            db.func.date(app.Visitor.last_visit) == date
+        ).count()
+        daily_visitors.append({'date': date.strftime('%Y-%m-%d'), 'count': count})
+    
+    analytics = {
+        'total_visitors': total_visitors,
+        'recent_visitors': recent_visitors,
+        'browser_stats': browser_stats,
+        'os_stats': os_stats,
+        'device_stats': device_stats,
+        'daily_visitors': list(reversed(daily_visitors)),
+        'recent_login_attempts': recent_login_attempts
+    }
+    
+    return render_template('admin_dashboard.html', 
+                         projects=projects, 
+                         contacts=contacts, 
+                         analytics=analytics)
 
 @app.route('/admin/project/add', methods=['GET', 'POST'])
 @login_required
