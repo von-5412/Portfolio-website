@@ -266,7 +266,114 @@ document.addEventListener('DOMContentLoaded', function() {
         imageObserver.observe(img);
     });
     
-    console.log('Portfolio website loaded successfully!');
+    // Floating button visibility
+    const floatingBtn = document.getElementById('backToTop');
+    
+    function toggleFloatingButton() {
+        if (window.scrollY > 300) {
+            floatingBtn.style.display = 'flex';
+        } else {
+            floatingBtn.style.display = 'none';
+        }
+    }
+    
+    window.addEventListener('scroll', toggleFloatingButton);
+    toggleFloatingButton(); // Initial call
+    
+    // Add magnetic effect to buttons
+    const magneticButtons = document.querySelectorAll('.btn, .floating-btn');
+    
+    magneticButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function(e) {
+            this.style.transform = 'translateY(-3px) scale(1.05)';
+        });
+        
+        btn.addEventListener('mouseleave', function(e) {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Dynamic typing effect for hero subtitle
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    if (heroSubtitle) {
+        const originalText = heroSubtitle.textContent;
+        heroSubtitle.textContent = '';
+        heroSubtitle.classList.add('typewriter');
+        
+        let i = 0;
+        function typeWriter() {
+            if (i < originalText.length) {
+                heroSubtitle.textContent += originalText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            } else {
+                heroSubtitle.classList.remove('typewriter');
+            }
+        }
+        
+        setTimeout(typeWriter, 1000);
+    }
+    
+    // Cursor trail effect
+    let trail = [];
+    const maxTrail = 20;
+    
+    function createTrailDot(x, y) {
+        const dot = document.createElement('div');
+        dot.className = 'cursor-trail';
+        dot.style.left = x + 'px';
+        dot.style.top = y + 'px';
+        document.body.appendChild(dot);
+        
+        trail.push(dot);
+        
+        if (trail.length > maxTrail) {
+            const oldDot = trail.shift();
+            oldDot.remove();
+        }
+        
+        setTimeout(() => {
+            dot.style.opacity = '0';
+            dot.style.transform = 'scale(0)';
+        }, 100);
+        
+        setTimeout(() => {
+            if (dot.parentNode) {
+                dot.remove();
+            }
+        }, 500);
+    }
+    
+    document.addEventListener('mousemove', (e) => {
+        if (window.innerWidth > 768) { // Only on desktop
+            createTrailDot(e.clientX, e.clientY);
+        }
+    });
+    
+    // Random portfolio item animations
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    portfolioItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.2}s`;
+        
+        // Add glitch effect to project titles occasionally
+        const title = item.querySelector('h4');
+        if (title && Math.random() > 0.7) {
+            title.classList.add('glitch-text');
+        }
+    });
+    
+    // Interactive tech stack items
+    const techItems = document.querySelectorAll('.tech-item');
+    techItems.forEach(item => {
+        item.addEventListener('click', function() {
+            this.style.transform = 'scale(1.2) rotate(5deg)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            }, 200);
+        });
+    });
+    
+    console.log('🚀 Unique portfolio loaded with style!');
 });
 
 // Utility function to debounce events

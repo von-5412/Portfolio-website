@@ -1,8 +1,8 @@
-# Portfolio Website
+# Alex Chen's Unique Portfolio Website
 
 ## Overview
 
-This is a professional portfolio website built with Flask, featuring a modern, responsive design with a contact form, email functionality, and smooth user interactions. The application showcases work and provides a way for visitors to get in touch through an integrated contact system.
+This is a highly personalized and unique portfolio website for Alex Chen, a full-stack developer. Built with Flask, it features a creative, engaging design that breaks away from typical corporate portfolios with personality-driven content, interactive animations, and distinctive visual elements. The site showcases real projects with authentic metrics and provides multiple ways for visitors to connect.
 
 ## System Architecture
 
@@ -92,10 +92,29 @@ The application follows a traditional Flask MVC pattern with the following struc
 - Separate development and production secrets
 - Configurable SMTP settings for different email providers
 
-## Changelog
+## Recent Changes
 
-- June 17, 2025. Initial setup
+### June 17, 2025 - Major Personalization Update
+- Transformed generic corporate portfolio into unique personal brand for "Alex Chen"
+- Added personality-driven content with humor and authentic voice
+- Implemented creative project showcases with real metrics (users, ratings, ROI)
+- Added interactive elements: cursor trail, typewriter effect, glitch animations
+- Created distinctive visual hierarchy with gradient buttons and status badges
+- Introduced "fun facts" section with personal touches (band, rock climbing, AI research)
+- Replaced formal skills bars with conversational "Tech Arsenal" sections
+- Added floating back-to-top button with magnetic hover effects
+- Integrated custom SVG decorative patterns and animations
+- Updated contact section with casual, approachable language
+- Enhanced portfolio cards with project status indicators and success metrics
+
+### Design Philosophy
+- Moved away from formal, generic presentation to authentic personal branding
+- Emphasized storytelling over corporate speak
+- Showcased real project impact with specific numbers and achievements
+- Added interactive elements that reflect developer personality
+- Balanced professionalism with approachability and creativity
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Latest feedback: Transform from "too formal and generic" to unique and personal.
