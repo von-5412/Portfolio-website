@@ -102,6 +102,33 @@ def init_models(db):
         first_visit = db.Column(db.DateTime, default=datetime.utcnow)
         last_visit = db.Column(db.DateTime, default=datetime.utcnow)
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
+        
+        # Enhanced tracking fields
+        accept_encoding = db.Column(db.String(200))  # Compression preferences
+        connection_type = db.Column(db.String(50))   # keep-alive, close, etc.
+        dnt_enabled = db.Column(db.Boolean, default=False)  # Do Not Track preference
+        x_forwarded_for = db.Column(db.String(200))  # Proxy chain
+        x_real_ip = db.Column(db.String(45))         # Real IP behind proxy
+        host = db.Column(db.String(100))             # Host header
+        session_start = db.Column(db.DateTime)       # Session start time
+        session_duration = db.Column(db.Integer)     # Session length in seconds
+        timezone_offset = db.Column(db.String(10))   # UTC offset
+        page_load_time = db.Column(db.Integer)       # Page load time in ms
+        viewport_size = db.Column(db.String(20))     # Browser viewport size
+        color_depth = db.Column(db.Integer)          # Screen color depth
+        pixel_ratio = db.Column(db.Float)            # Device pixel ratio
+        online_status = db.Column(db.Boolean)        # Navigator.onLine
+        cookies_enabled = db.Column(db.Boolean)      # Cookie support
+        local_storage = db.Column(db.Boolean)        # LocalStorage support
+        session_storage = db.Column(db.Boolean)      # SessionStorage support
+        webgl_vendor = db.Column(db.String(100))     # WebGL renderer info
+        webgl_renderer = db.Column(db.String(200))
+        cpu_cores = db.Column(db.Integer)            # Hardware concurrency
+        memory_size = db.Column(db.Integer)          # Device memory (GB)
+        battery_level = db.Column(db.Float)          # Battery level (0-1)
+        charging_status = db.Column(db.Boolean)      # Is charging
+        network_type = db.Column(db.String(50))      # Connection type (4g, wifi, etc.)
+        network_speed = db.Column(db.String(20))     # Effective connection type
 
         def to_dict(self):
             return {

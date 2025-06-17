@@ -489,24 +489,162 @@ if ('performance' in window) {
     });
 }
 
-// Visitor tracking
+// Enhanced visitor tracking
 function trackVisitorData() {
     try {
         const visitorData = {
+            // Basic display info
             screen_resolution: `${screen.width}x${screen.height}`,
-            visit_duration: Math.floor((Date.now() - window.pageLoadTime) / 1000)
+            viewport_size: `${window.innerWidth}x${window.innerHeight}`,
+            color_depth: screen.colorDepth,
+            pixel_ratio: window.devicePixelRatio,
+            
+            // Time and session info
+            visit_duration: Math.floor((Date.now() - window.pageLoadTime) / 1000),
+            timezone_offset: new Date().getTimezoneOffset(),
+            page_load_time: window.performance ? Math.round(window.performance.timing.loadEventEnd - window.performance.timing.navigationStart) : null,
+            
+            // Browser capabilities
+            cookies_enabled: navigator.cookieEnabled,
+            local_storage: typeof(Storage) !== "undefined",
+            session_storage: typeof(sessionStorage) !== "undefined",
+            online_status: navigator.onLine,
+            
+            // Hardware info (if available)
+            cpu_cores: navigator.hardwareConcurrency || null,
+            memory_size: navigator.deviceMemory || null,
+            
+            // WebGL info for fingerprinting
+            webgl_info: getWebGLInfo(),
+            
+            // Network info (if available)
+            network_info: getNetworkInfo(),
+            
+            // Battery info (if available)
+            battery_info: null, // Will be populated below
+            
+            // Additional browser features
+            java_enabled: navigator.javaEnabled ? navigator.javaEnabled() : false,
+            plugins: getPluginInfo(),
+            fonts: null, // Font detection is complex and privacy-invasive
+            
+            // Mouse and touch info
+            touch_support: 'ontouchstart' in window,
+            max_touch_points: navigator.maxTouchPoints || 0,
+            
+            // Audio context fingerprinting
+            audio_fingerprint: getAudioFingerprint()
         };
 
-        fetch('/api/track-visitor', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(visitorData)
-        }).catch(console.error);
+        // Get battery info if available
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(function(battery) {
+                visitorData.battery_info = {
+                    level: battery.level,
+                    charging: battery.charging
+                };
+                sendVisitorData(visitorData);
+            });
+        } else {
+            sendVisitorData(visitorData);
+        }
     } catch (error) {
         console.error('Error tracking visitor data:', error);
     }
+}
+
+function getWebGLInfo() {
+    try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) return null;
+        
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        return {
+            vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : null,
+            renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null,
+            version: gl.getParameter(gl.VERSION),
+            shading_language_version: gl.getParameter(gl.SHADING_LANGUAGE_VERSION)
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+function getNetworkInfo() {
+    try {
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (!connection) return null;
+        
+        return {
+            effective_type: connection.effectiveType,
+            type: connection.type,
+            downlink: connection.downlink,
+            rtt: connection.rtt,
+            save_data: connection.saveData
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+function getPluginInfo() {
+    try {
+        const plugins = [];
+        for (let i = 0; i < navigator.plugins.length; i++) {
+            plugins.push({
+                name: navigator.plugins[i].name,
+                filename: navigator.plugins[i].filename
+            });
+        }
+        return plugins.slice(0, 10); // Limit to first 10 plugins
+    } catch (e) {
+        return [];
+    }
+}
+
+function getAudioFingerprint() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const analyser = audioContext.createAnalyser();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.type = 'triangle';
+        oscillator.frequency.value = 10000;
+        gainNode.gain.value = 0.05;
+        
+        oscillator.connect(analyser);
+        analyser.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start(0);
+        oscillator.stop(audioContext.currentTime + 0.1);
+        
+        const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(frequencyData);
+        
+        audioContext.close();
+        
+        // Create a simple hash of the frequency data
+        let hash = 0;
+        for (let i = 0; i < frequencyData.length; i++) {
+            hash = ((hash << 5) - hash + frequencyData[i]) & 0xffffffff;
+        }
+        return hash.toString();
+    } catch (e) {
+        return null;
+    }
+}
+
+function sendVisitorData(data) {
+    fetch('/api/track-visitor', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    }).catch(console.error);
 }
 
 // Track page load time
@@ -520,11 +658,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Track when user leaves the page
 window.addEventListener('beforeunload', trackVisitorData);
 
-// Fix duplicate declaration error - Remove duplicate portfolioItems declaration
-const portfolioElements = document.querySelectorAll('.portfolio-item');
-
-// Portfolio item animations
-portfolioElements.forEach((item, index) => {
+// Portfolio item animations (consolidated)
+document.querySelectorAll('.portfolio-item').forEach((item, index) => {
     item.style.animationDelay = `${index * 0.2}s`;
 
     // Add glitch effect to project titles occasionally

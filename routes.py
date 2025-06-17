@@ -61,7 +61,7 @@ def parse_user_agent(user_agent_string):
     return browser, os, device
 
 def track_visitor():
-    """Track visitor information"""
+    """Track visitor information with enhanced data collection"""
     try:
         ip_address = get_client_ip()
         user_agent = request.headers.get('User-Agent', '')
@@ -70,17 +70,42 @@ def track_visitor():
         page_visited = request.path
         language = request.headers.get('Accept-Language', '').split(',')[0] if request.headers.get('Accept-Language') else 'en'
         
+        # Additional header information
+        accept_encoding = request.headers.get('Accept-Encoding', '')
+        connection_type = request.headers.get('Connection', '')
+        dnt = request.headers.get('DNT', '')  # Do Not Track
+        x_forwarded_for = request.headers.get('X-Forwarded-For', '')
+        x_real_ip = request.headers.get('X-Real-IP', '')
+        host = request.headers.get('Host', '')
+        
+        # Time-based data
+        visit_time = datetime.utcnow()
+        local_time = request.headers.get('X-Local-Time', '')
+        timezone_offset = request.headers.get('X-Timezone-Offset', '')
+        
         # Check if visitor exists
         existing_visitor = app.Visitor.query.filter_by(ip_address=ip_address).first()
         
         if existing_visitor:
-            # Update existing visitor
+            # Update existing visitor with new data
             existing_visitor.visit_count += 1
-            existing_visitor.last_visit = datetime.utcnow()
+            existing_visitor.last_visit = visit_time
             existing_visitor.page_visited = page_visited
             existing_visitor.user_agent = user_agent
+            existing_visitor.accept_encoding = accept_encoding
+            existing_visitor.connection_type = connection_type
+            existing_visitor.dnt_enabled = bool(dnt)
+            existing_visitor.host = host
+            
+            # Track session duration if we have timestamps
+            if existing_visitor.session_start:
+                session_duration = (visit_time - existing_visitor.session_start).total_seconds()
+                existing_visitor.session_duration = int(session_duration)
+            else:
+                existing_visitor.session_start = visit_time
+                
         else:
-            # Create new visitor record
+            # Create new visitor record with enhanced data
             visitor = app.Visitor(
                 ip_address=ip_address,
                 user_agent=user_agent,
@@ -89,7 +114,15 @@ def track_visitor():
                 device=device,
                 referrer=referrer,
                 page_visited=page_visited,
-                language=language
+                language=language,
+                accept_encoding=accept_encoding,
+                connection_type=connection_type,
+                dnt_enabled=bool(dnt),
+                x_forwarded_for=x_forwarded_for,
+                x_real_ip=x_real_ip,
+                host=host,
+                session_start=visit_time,
+                timezone_offset=timezone_offset
             )
             db.session.add(visitor)
         
@@ -219,17 +252,59 @@ def api_projects():
 
 @app.route('/api/track-visitor', methods=['POST'])
 def track_visitor_api():
-    """API endpoint to track additional visitor data from frontend"""
+    """API endpoint to track comprehensive visitor data from frontend"""
     try:
         data = request.get_json()
         ip_address = get_client_ip()
         
         visitor = app.Visitor.query.filter_by(ip_address=ip_address).first()
         if visitor:
+            # Update all available fields
             if data.get('screen_resolution'):
                 visitor.screen_resolution = data['screen_resolution']
+            if data.get('viewport_size'):
+                visitor.viewport_size = data['viewport_size']
+            if data.get('color_depth'):
+                visitor.color_depth = data['color_depth']
+            if data.get('pixel_ratio'):
+                visitor.pixel_ratio = data['pixel_ratio']
             if data.get('visit_duration'):
                 visitor.visit_duration = data['visit_duration']
+            if data.get('timezone_offset'):
+                visitor.timezone_offset = str(data['timezone_offset'])
+            if data.get('page_load_time'):
+                visitor.page_load_time = data['page_load_time']
+            if data.get('cookies_enabled') is not None:
+                visitor.cookies_enabled = data['cookies_enabled']
+            if data.get('local_storage') is not None:
+                visitor.local_storage = data['local_storage']
+            if data.get('session_storage') is not None:
+                visitor.session_storage = data['session_storage']
+            if data.get('online_status') is not None:
+                visitor.online_status = data['online_status']
+            if data.get('cpu_cores'):
+                visitor.cpu_cores = data['cpu_cores']
+            if data.get('memory_size'):
+                visitor.memory_size = data['memory_size']
+            
+            # WebGL info
+            webgl_info = data.get('webgl_info')
+            if webgl_info:
+                visitor.webgl_vendor = webgl_info.get('vendor', '')[:100]
+                visitor.webgl_renderer = webgl_info.get('renderer', '')[:200]
+            
+            # Network info
+            network_info = data.get('network_info')
+            if network_info:
+                visitor.network_type = network_info.get('effective_type', '')
+                visitor.network_speed = network_info.get('type', '')
+            
+            # Battery info
+            battery_info = data.get('battery_info')
+            if battery_info:
+                visitor.battery_level = battery_info.get('level')
+                visitor.charging_status = battery_info.get('charging')
+            
             db.session.commit()
         
         return jsonify({'status': 'success'})
