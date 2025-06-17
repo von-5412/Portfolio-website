@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="home" class="hero-section d-flex align-items-center">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title">Creative Professional</h1>
+                    <h2 class="hero-subtitle">Crafting Digital Experiences</h2>
+                    <p class="hero-description">
+                        Passionate about creating beautiful, functional, and user-centered digital solutions 
+                        that make a difference. Let's bring your vision to life.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#portfolio" class="btn btn-primary btn-lg me-3">View My Work</a>
+                        <a href="#contact" class="btn btn-outline-primary btn-lg">Get In Touch</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <img src="https://pixabay.com/get/gdc1ec6587acc6a0fcf15e2151b002b16ea0558cc57a401bc996bf80cde0a3c53bf426d9e2f2b2d2353c6a87bdade8a7d9d42132dad6b4e41a40097ab0d284746_1280.jpg" 
+                         alt="Professional workspace" class="img-fluid rounded-4 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-bg">
+        {{ url_for('static', filename='images/hero-bg.svg') | safe }}
+    </div>
+</section>
+
+<!-- Portfolio Section -->
+<section id="portfolio" class="portfolio-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Featured Work</h2>
+                <p class="section-subtitle">A selection of projects that showcase my skills and creativity</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Project 1 -->
+            <div class="col-lg-6 mb-4">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <img src="https://pixabay.com/get/g3af4886b02c06dec51e3fd27787af713b51c9be1d99d00a701414324d4f030d8692fbe7e8c4fc5a4fe3758a531b1faf9a4c104f3102a5e6f304a58ba91169422_1280.jpg" 
+                             alt="Web Design Project" class="img-fluid">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-links">
+                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-eye"></i> View</a>
+                                <a href="#" class="btn btn-light btn-sm"><i class="fab fa-github"></i> Code</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Modern Web Application</h4>
+                        <p>A responsive web application built with modern technologies, featuring clean design and intuitive user experience.</p>
+                        <div class="portfolio-tags">
+                            <span class="badge bg-primary">React</span>
+                            <span class="badge bg-primary">Node.js</span>
+                            <span class="badge bg-primary">MongoDB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project 2 -->
+            <div class="col-lg-6 mb-4">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <img src="https://pixabay.com/get/g365e037a35adbfe1b4af2927a32692a59da6146d599aa49c1dad6a17b2e1ea97b0e63da1489f775ea5913ecb98cd02c5f35ec19622015a879fa5594d3015a85a_1280.jpg" 
+                             alt="Mobile Design" class="img-fluid">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-links">
+                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-eye"></i> View</a>
+                                <a href="#" class="btn btn-light btn-sm"><i class="fab fa-github"></i> Code</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Mobile-First Design</h4>
+                        <p>A mobile-optimized interface design focusing on user engagement and seamless navigation across all devices.</p>
+                        <div class="portfolio-tags">
+                            <span class="badge bg-primary">UI/UX</span>
+                            <span class="badge bg-primary">Figma</span>
+                            <span class="badge bg-primary">Responsive</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project 3 -->
+            <div class="col-lg-6 mb-4">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <img src="https://pixabay.com/get/g10b8156f3ffdc86b9db4e1aa071b01cb4db78dca4d23f1fdd7bed02b247dcd045e2539a6ae207af4ae92d1af905932f1e4c8c27dacee8625aee238fec7fc7475_1280.jpg" 
+                             alt="Creative Project" class="img-fluid">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-links">
+                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-eye"></i> View</a>
+                                <a href="#" class="btn btn-light btn-sm"><i class="fab fa-github"></i> Code</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Creative Digital Solution</h4>
+                        <p>An innovative digital platform that combines creativity with functionality to deliver exceptional user experiences.</p>
+                        <div class="portfolio-tags">
+                            <span class="badge bg-primary">Python</span>
+                            <span class="badge bg-primary">Flask</span>
+                            <span class="badge bg-primary">API</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project 4 -->
+            <div class="col-lg-6 mb-4">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <img src="https://pixabay.com/get/g736fb86344eac8c5436a86eab20605a800e59f0dff81fbe320d054e7db977425a59e2f2171984666c55c23d95b490c4050492edf623d1a265466752c028aab81_1280.jpg" 
+                             alt="Brand Identity" class="img-fluid">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-links">
+                                <a href="#" class="btn btn-light btn-sm me-2"><i class="fas fa-eye"></i> View</a>
+                                <a href="#" class="btn btn-light btn-sm"><i class="fab fa-dribbble"></i> Dribbble</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Brand Identity Design</h4>
+                        <p>Complete brand identity package including logo design, color palette, and visual guidelines for a modern startup.</p>
+                        <div class="portfolio-tags">
+                            <span class="badge bg-primary">Branding</span>
+                            <span class="badge bg-primary">Logo</span>
+                            <span class="badge bg-primary">Identity</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about-section py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4">
+                <div class="about-image">
+                    <img src="https://pixabay.com/get/ga980a71fdf1b975f7d9f0c86818a7fc260b68ffdc261994ec859761d5c29a66c279de8cb63506de931dcfccbf10b979343e6545d1a5e2d971985c5fb59f5cc7c_1280.jpg" 
+                         alt="About me" class="img-fluid rounded-4 shadow">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-content">
+                    <h2 class="section-title">About Me</h2>
+                    <p class="lead">
+                        I'm a passionate creative professional with a strong background in web development, 
+                        UI/UX design, and digital innovation.
+                    </p>
+                    <p>
+                        With over 5 years of experience in the industry, I specialize in creating beautiful, 
+                        functional, and user-centered digital experiences. My approach combines technical 
+                        expertise with creative vision to deliver solutions that not only look great but 
+                        also perform exceptionally.
+                    </p>
+                    
+                    <div class="skills-section mt-4">
+                        <h4>Core Skills</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="skill-item">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Web Development</span>
+                                        <span>95%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 95%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="skill-item">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>UI/UX Design</span>
+                                        <span>90%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 90%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="skill-item">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Python/Flask</span>
+                                        <span>88%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 88%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="skill-item">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Creative Design</span>
+                                        <span>92%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-stats mt-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="stat-number">50+</h3>
+                                    <p class="stat-label">Projects</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="stat-number">30+</h3>
+                                    <p class="stat-label">Happy Clients</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="stat-number">5+</h3>
+                                    <p class="stat-label">Years Experience</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Get In Touch</h2>
+                <p class="section-subtitle">Ready to work together? Let's create something amazing!</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <form method="POST" action="{{ url_for('contact') }}" class="contact-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-4 text-center mb-4">
+                <div class="contact-info">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h5>Email</h5>
+                    <p>hello@portfolio.com</p>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center mb-4">
+                <div class="contact-info">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h5>Phone</h5>
+                    <p>+1 (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center mb-4">
+                <div class="contact-info">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h5>Location</h5>
+                    <p>San Francisco, CA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

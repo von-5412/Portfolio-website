@@ -1,0 +1,65 @@
+<svg width="100%" height="100%" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ECF0F1;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#3498DB;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2C3E50;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#ECF0F1;stop-opacity:0.8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background shapes -->
+  <circle cx="100" cy="100" r="80" fill="url(#gradient1)" opacity="0.3">
+    <animate attributeName="r" values="80;120;80" dur="6s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="1100" cy="200" r="60" fill="url(#gradient2)" opacity="0.4">
+    <animate attributeName="r" values="60;90;60" dur="8s" repeatCount="indefinite" />
+  </circle>
+  
+  <polygon points="200,600 350,500 500,650 200,700" fill="url(#gradient1)" opacity="0.2">
+    <animateTransform attributeName="transform" type="rotate" values="0 350 600;10 350 600;0 350 600" dur="10s" repeatCount="indefinite" />
+  </polygon>
+  
+  <polygon points="800,100 950,50 1100,150 950,200" fill="url(#gradient2)" opacity="0.3">
+    <animateTransform attributeName="transform" type="rotate" values="0 950 125;-5 950 125;0 950 125" dur="12s" repeatCount="indefinite" />
+  </polygon>
+  
+  <!-- Geometric patterns -->
+  <g opacity="0.1">
+    <rect x="50" y="300" width="100" height="100" fill="#3498DB" transform="rotate(45 100 350)">
+      <animateTransform attributeName="transform" type="rotate" values="45 100 350;135 100 350;45 100 350" dur="15s" repeatCount="indefinite" />
+    </rect>
+    
+    <rect x="1000" y="600" width="80" height="80" fill="#2C3E50" transform="rotate(30 1040 640)">
+      <animateTransform attributeName="transform" type="rotate" values="30 1040 640;120 1040 640;30 1040 640" dur="18s" repeatCount="indefinite" />
+    </rect>
+  </g>
+  
+  <!-- Floating elements -->
+  <circle cx="300" cy="150" r="3" fill="#3498DB" opacity="0.6">
+    <animate attributeName="cy" values="150;130;150" dur="4s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="900" cy="400" r="4" fill="#E74C3C" opacity="0.5">
+    <animate attributeName="cy" values="400;380;400" dur="5s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="5s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="600" cy="700" r="2" fill="#2C3E50" opacity="0.7">
+    <animate attributeName="cy" values="700;680;700" dur="3s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Abstract wave patterns -->
+  <path d="M0,400 Q300,350 600,400 T1200,400 L1200,800 L0,800 Z" fill="url(#gradient1)" opacity="0.1">
+    <animate attributeName="d" values="M0,400 Q300,350 600,400 T1200,400 L1200,800 L0,800 Z;M0,420 Q300,370 600,420 T1200,420 L1200,800 L0,800 Z;M0,400 Q300,350 600,400 T1200,400 L1200,800 L0,800 Z" dur="8s" repeatCount="indefinite" />
+  </path>
+  
+  <path d="M0,0 L1200,0 L1200,300 Q900,250 600,300 T0,300 Z" fill="url(#gradient2)" opacity="0.08">
+    <animate attributeName="d" values="M0,0 L1200,0 L1200,300 Q900,250 600,300 T0,300 Z;M0,0 L1200,0 L1200,320 Q900,270 600,320 T0,320 Z;M0,0 L1200,0 L1200,300 Q900,250 600,300 T0,300 Z" dur="10s" repeatCount="indefinite" />
+  </path>
+</svg>
