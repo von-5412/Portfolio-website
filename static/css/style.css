@@ -8,6 +8,10 @@
     --white: #ffffff;
     --light-gray: #f8f9fa;
     --transition: all 0.3s ease;
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-accent: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
 /* Base Styles */
@@ -293,6 +297,46 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
     transition: var(--transition);
     margin-bottom: 2rem;
+    position: relative;
+}
+
+/* Portfolio Status Badge */
+.portfolio-status {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(44, 62, 80, 0.9);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+}
+
+/* Portfolio Metrics */
+.portfolio-metrics {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.portfolio-metrics .metric {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    background: var(--light-gray);
+    padding: 4px 10px;
+    border-radius: 15px;
+}
+
+.portfolio-metrics .metric i {
+    color: var(--accent-color);
 }
 
 .portfolio-item:hover {
@@ -354,12 +398,123 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.5rem;
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
+    border: none;
+    font-weight: 500;
+}
+
+.portfolio-tags .bg-primary {
+    background: var(--gradient-primary) !important;
+}
+
+.portfolio-tags .bg-secondary {
+    background: linear-gradient(45deg, #6c757d, #495057) !important;
+}
+
+.portfolio-tags .bg-accent {
+    background: var(--gradient-accent) !important;
 }
 
 /* About Section */
 .about-section {
     padding: 100px 0;
     background: var(--light-gray);
+    position: relative;
+    overflow: hidden;
+}
+
+.decorative-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/decorative-pattern.svg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.about-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Fun Facts */
+.fun-facts {
+    margin: 2rem 0;
+}
+
+.fact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(44, 62, 80, 0.05);
+    transition: var(--transition);
+}
+
+.fact-item:hover {
+    transform: translateX(10px);
+    box-shadow: 0 6px 20px rgba(44, 62, 80, 0.1);
+}
+
+.fact-icon {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.fact-text {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* Tech Stack */
+.tech-stack {
+    margin-top: 2rem;
+}
+
+.tech-category {
+    margin-bottom: 1.5rem;
+}
+
+.tech-category h6 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+}
+
+.tech-items {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tech-item {
+    background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: var(--transition);
+    cursor: default;
+}
+
+.tech-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
 
 .about-image img {
@@ -604,10 +759,116 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
+    background: var(--gradient-primary);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-color);
+    background: var(--gradient-accent);
+}
+
+/* Unique Interactive Elements */
+.glitch-text {
+    position: relative;
+    color: var(--primary-color);
+    animation: glitch 3s infinite;
+}
+
+@keyframes glitch {
+    0%, 90%, 100% {
+        transform: translate(0);
+    }
+    10% {
+        transform: translate(-2px, 2px);
+    }
+    20% {
+        transform: translate(2px, -2px);
+    }
+}
+
+/* Floating Action Button */
+.floating-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    box-shadow: var(--shadow-soft);
+    z-index: 1000;
+    transition: var(--transition);
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-btn:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Cursor Trail Effect */
+.cursor-trail {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.7;
+    transition: all 0.1s ease;
+}
+
+/* Magnetic Effect for Buttons */
+.btn-magnetic {
+    transition: transform 0.2s ease;
+}
+
+/* Special Hover Effects */
+.portfolio-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.portfolio-item:hover::before {
+    left: 100%;
+}
+
+/* Typewriter Effect */
+.typewriter {
+    overflow: hidden;
+    border-right: 3px solid var(--accent-color);
+    white-space: nowrap;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--accent-color) }
 }
