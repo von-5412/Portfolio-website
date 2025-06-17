@@ -471,11 +471,88 @@
             <div class="col-lg-3 col-md-6 mb-3">
                 <div class="stat-card">
                     <div class="stat-icon users">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-envelope"></i>
                     </div>
-                    <div class="stat-number">{{ projects|selectattr('users_count')|map(attribute='users_count')|map('int')|sum|default(0) }}</div>
-                    <div class="stat-label">Total Users</div>
+                    <div class="stat-number">{{ contacts|length }}</div>
+                    <div class="stat-label">Messages</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Contact Messages Section -->
+        <div class="projects-table-container mb-4">
+            <div class="table-header">
+                <h3 class="table-title">
+                    <i class="fas fa-envelope me-2"></i>Contact Messages
+                </h3>
+                <span class="badge bg-info">{{ contacts|length }} messages</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Contact Details</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                        <tr class="{% if not contact.is_read %}table-warning{% endif %}">
+                            <td>
+                                <div class="project-title">{{ contact.name }}</div>
+                                <div class="project-description">{{ contact.email }}</div>
+                            </td>
+                            <td>
+                                <strong>{{ contact.subject }}</strong>
+                            </td>
+                            <td>
+                                <div class="message-preview">
+                                    {{ contact.message[:100] }}{% if contact.message|length > 100 %}...{% endif %}
+                                </div>
+                            </td>
+                            <td>{{ contact.created_at.strftime('%m/%d/%Y %I:%M %p') }}</td>
+                            <td>
+                                {% if contact.is_read %}
+                                    <span class="badge bg-success">Read</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Unread</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    {% if not contact.is_read %}
+                                    <form method="POST" action="{{ url_for('mark_contact_read', contact_id=contact.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-action btn-edit">
+                                            <i class="fas fa-check me-1"></i>Mark Read
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('delete_contact', contact_id=contact.id) }}" class="d-inline delete-contact-form">
+                                        <button type="submit" class="btn btn-action btn-delete">
+                                            <i class="fas fa-trash me-1"></i>Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <h5>No messages yet</h5>
+                                    <p>Contact messages will appear here when people reach out through your portfolio</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -588,7 +665,7 @@
                 loadingSpinner.style.display = 'none';
             }, 500);
 
-            // Confirm delete functionality
+            // Confirm delete functionality for projects
             const deleteForms = document.querySelectorAll('.delete-form');
             deleteForms.forEach(form => {
                 form.addEventListener('submit', function(e) {
@@ -597,6 +674,29 @@
                     const projectTitle = this.closest('tr').querySelector('.project-title').textContent;
 
                     if (confirm(`Are you sure you want to delete "${projectTitle}"? This action cannot be undone.`)) {
+                        // Add loading state to delete button
+                        const deleteBtn = this.querySelector('button');
+                        const originalText = deleteBtn.innerHTML;
+                        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
+                        deleteBtn.disabled = true;
+
+                        // Submit the form
+                        setTimeout(() => {
+                            this.submit();
+                        }, 1000);
+                    }
+                });
+            });
+
+            // Confirm delete functionality for contact messages
+            const deleteContactForms = document.querySelectorAll('.delete-contact-form');
+            deleteContactForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const contactName = this.closest('tr').querySelector('.project-title').textContent;
+
+                    if (confirm(`Are you sure you want to delete the message from "${contactName}"? This action cannot be undone.`)) {
                         // Add loading state to delete button
                         const deleteBtn = this.querySelector('button');
                         const originalText = deleteBtn.innerHTML;
