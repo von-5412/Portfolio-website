@@ -63,3 +63,114 @@ def not_found(error):
 def internal_error(error):
     """Handle 500 errors"""
     return render_template('index.html'), 500
+
+# Admin routes
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    """Admin login page"""
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = app.User.query.filter_by(username=username).first()
+        
+        if user and user.check_password(password) and user.is_admin:
+            login_user(user)
+            flash('Logged in successfully!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid credentials or not an admin user.', 'error')
+    
+    return render_template('admin_login.html')
+
+@app.route('/admin/logout')
+@login_required
+def admin_logout():
+    """Admin logout"""
+    logout_user()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('index'))
+
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    """Admin dashboard with project management"""
+    if not current_user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    projects = app.Project.query.order_by(app.Project.created_at.desc()).all()
+    return render_template('admin_dashboard.html', projects=projects)
+
+@app.route('/admin/project/add', methods=['GET', 'POST'])
+@login_required
+def add_project():
+    """Add new project"""
+    if not current_user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        project = app.Project(
+            title=request.form.get('title'),
+            description=request.form.get('description'),
+            thumbnail_url=request.form.get('thumbnail_url'),
+            project_url=request.form.get('project_url'),
+            github_url=request.form.get('github_url'),
+            technologies=request.form.get('technologies'),
+            status=request.form.get('status'),
+            rating=float(request.form.get('rating', 0)),
+            users_count=request.form.get('users_count'),
+            metrics=request.form.get('metrics'),
+            is_featured=bool(request.form.get('is_featured'))
+        )
+        
+        db.session.add(project)
+        db.session.commit()
+        flash('Project added successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+    
+    return render_template('admin_project_form.html', project=None)
+
+@app.route('/admin/project/edit/<int:project_id>', methods=['GET', 'POST'])
+@login_required
+def edit_project(project_id):
+    """Edit existing project"""
+    if not current_user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    project = app.Project.query.get_or_404(project_id)
+    
+    if request.method == 'POST':
+        project.title = request.form.get('title')
+        project.description = request.form.get('description')
+        project.thumbnail_url = request.form.get('thumbnail_url')
+        project.project_url = request.form.get('project_url')
+        project.github_url = request.form.get('github_url')
+        project.technologies = request.form.get('technologies')
+        project.status = request.form.get('status')
+        project.rating = float(request.form.get('rating', 0))
+        project.users_count = request.form.get('users_count')
+        project.metrics = request.form.get('metrics')
+        project.is_featured = bool(request.form.get('is_featured'))
+        
+        db.session.commit()
+        flash('Project updated successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+    
+    return render_template('admin_project_form.html', project=project)
+
+@app.route('/admin/project/delete/<int:project_id>', methods=['POST'])
+@login_required
+def delete_project(project_id):
+    """Delete project"""
+    if not current_user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    project = app.Project.query.get_or_404(project_id)
+    db.session.delete(project)
+    db.session.commit()
+    flash('Project deleted successfully!', 'success')
+    return redirect(url_for('admin_dashboard'))
