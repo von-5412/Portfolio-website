@@ -1,8 +1,7 @@
-# Alex Chen's Unique Portfolio Website
 
 ## Overview
 
-This is a highly personalized and unique portfolio website for Alex Chen, a full-stack developer. Built with Flask, it features a creative, engaging design that breaks away from typical corporate portfolios with personality-driven content, interactive animations, and distinctive visual elements. The site showcases real projects with authentic metrics and provides multiple ways for visitors to connect.
+This is a highly personalized and unique portfolio website for a full-stack developer. Built with Flask, it features a creative, engaging design that breaks away from typical corporate portfolios with personality-driven content, interactive animations, and distinctive visual elements. The site showcases real projects with authentic metrics and provides multiple ways for visitors to connect.
 
 ## System Architecture
 
